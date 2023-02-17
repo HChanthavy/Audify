@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "779983292936",
+    "project_id": "music-app-0001",
+    "storage_bucket": "music-app-0001.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779983292936:android:d1ce0cafcc49b8b2fd1fbd",
+        "android_client_info": {
+          "package_name": "com.example.audify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "779983292936-dmjtabk2iq5vb2f4i4qhegiemkl6u1gh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoUVBBxd_e6Dbx97croQ1hW_0jzJ2bsFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "779983292936-8tb2idd16l16dp0it62ggmfrpecgvanv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "779983292936-kohutkra4nkd5m46pbl951aaeo7dp75s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.audify"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
