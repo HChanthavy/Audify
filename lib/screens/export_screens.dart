@@ -6,3 +6,4 @@ export 'search_screen.dart';
 export 'library_screen.dart';
 export 'setting_screen.dart';
 export 'now_playing_screen.dart';
+export 'liked_songs_screen.dart';

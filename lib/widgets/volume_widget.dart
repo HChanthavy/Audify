@@ -14,19 +14,24 @@ class _VolumeBarState extends State<VolumeBar> {
   @override
   void initState() {
     PerfectVolumeControl.hideUI = true;
-    Future.delayed(Duration.zero, () async {
-      currentVol = await PerfectVolumeControl.getVolume();
-    });
+    Future.delayed(
+      Duration.zero,
+      () async {
+        currentVol = await PerfectVolumeControl.getVolume();
+      },
+    );
 
-    PerfectVolumeControl.stream.listen((volume) {
-      if (mounted) {
-        setState(
-          () {
-            currentVol = volume;
-          },
-        );
-      }
-    });
+    PerfectVolumeControl.stream.listen(
+      (volume) {
+        if (mounted) {
+          setState(
+            () {
+              currentVol = volume;
+            },
+          );
+        }
+      },
+    );
     super.initState();
   }
 

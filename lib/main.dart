@@ -13,12 +13,14 @@ void main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  // Start MongoDB Server
-
   // Initialize Firebase
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await initialization(null);
   runApp(const MyApp());
+}
+
+Future initialization(BuildContext? context) async {
+  await Future.delayed(const Duration(seconds: 3));
 }
 
 class MyApp extends StatelessWidget {
@@ -32,22 +34,28 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Audify',
         theme: ThemeData(
-            primaryColor: Colors.black,
-            splashColor: Colors.black,
-            highlightColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            textTheme: GoogleFonts.poppinsTextTheme(
-              Theme.of(context).textTheme.apply(
-                    bodyColor: Colors.grey.shade100,
-                    displayColor: Colors.grey.shade100,
-                  ),
-            ), colorScheme: ColorScheme.fromSwatch()
-                .copyWith(secondary: Colors.green.shade600).copyWith(background: Colors.black)),
+          primaryColor: Colors.black,
+          splashColor: Colors.black,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          textTheme: GoogleFonts.poppinsTextTheme(
+            Theme.of(context).textTheme.apply(
+                  bodyColor: Colors.grey.shade100,
+                  displayColor: Colors.grey.shade100,
+                ),
+          ),
+          colorScheme: ColorScheme.fromSwatch()
+              .copyWith(secondary: Colors.green.shade600)
+              .copyWith(background: Colors.black),
+        ),
         home: FutureBuilder(
           future: HttpService().getAllSongs(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator(color: Colors.green.shade600,));
+              return Center(
+                  child: CircularProgressIndicator(
+                color: Colors.green.shade600,
+              ));
             } else if (snapshot.hasData) {
               return const AuthScreen();
             } else if (snapshot.hasError) {
@@ -67,14 +75,6 @@ class MyApp extends StatelessWidget {
             }
           },
         ),
-        // getPages: [
-        //   GetPage(name: '/', page: () => const HomeScreen()),
-        //   GetPage(name: '/search', page: () => const SearchScreen()),
-        //   GetPage(name: '/now-playing', page: () => const NowPlayingScreen()),
-        //   GetPage(name: '/library', page: () => const LibraryScreen()),
-        //   GetPage(name: '/setting', page: () => const SettingScreen()),
-        //   // GetPage(name: '/', page: () => const HomeScreen()),
-        // ],
       ),
     );
   }

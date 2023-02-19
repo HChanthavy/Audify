@@ -15,12 +15,14 @@ class _SignInBackgroundState extends State<SignInBackground> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.asset('assets/videos/Spectrum1.mp4')
-      ..initialize().then((_) {
-        _controller.setVolume(0.0);
-        _controller.setLooping(true);
-        _controller.play();
-        setState(() {});
-      });
+      ..initialize().then(
+        (_) {
+          _controller.setVolume(0.0);
+          _controller.setLooping(true);
+          _controller.play();
+          setState(() {});
+        },
+      );
   }
 
   @override

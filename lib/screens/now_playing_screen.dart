@@ -1,5 +1,6 @@
-import 'package:audify/service/http_service.dart';
+import 'package:audify/globle/variable.dart';
 import 'package:audify/widgets/export_widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:audify/models/export_models.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,7 +17,6 @@ class NowPlayingScreen extends StatefulWidget {
 }
 
 class _NowPlayingScreenState extends State<NowPlayingScreen> {
-  HttpService httpService = HttpService();
   bool _isLike = false;
   bool _isPlaying = false;
   int _isLooping = 0;
@@ -33,6 +33,24 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
           duration.inSeconds.remainder(60).toString().padLeft(2, '0');
       return '$mintues:$seconds';
     }
+  }
+
+  Future<bool> checkInLikedSongs(
+      Future<List<dynamic>> likedList, String song) async {
+    bool inList = false;
+    for (var check in await likedList) {
+      if (check['name'] == song) {
+        inList = true;
+        break;
+      }
+    }
+
+    if (inList) {
+      _isLike = true;
+    } else {
+      _isLike = false;
+    }
+    return _isLike;
   }
 
   @override
@@ -77,25 +95,26 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
     );
   }
 
-  // @override
-  // void dispose() {
-  //   widget.audioPlayer.dispose();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser!;
+    Future<List<dynamic>> likedSongsList =
+        httpService.getJsonLikedSongs(user.displayName!).then((value) => value);
+
+    checkInLikedSongs(likedSongsList, widget.song.name).then((value) => value);
+
     return Container(
       color: Colors.white,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.88),
-                Colors.black,
-              ]),
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0.88),
+              Colors.black,
+            ],
+          ),
         ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -179,32 +198,53 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                               ],
                             ),
                             IconButton(
-                                onPressed: () {
-                                  var song = Song(
-                                      name: widget.song.name,
-                                      imageURL: widget.song.imageURL,
-                                      songURL: widget.song.songURL,
-                                      artist: widget.song.artist,
-                                      language: widget.song.language,
-                                      category: widget.song.category);
-                                  print(song);
-                                  
-
-                                  _isLike = !_isLike;
-                                  // if (_isLike) {
-                                  //   httpService.addLikedSong(
-                                  //       '/user/${widget.song.name}', song);
-                                  // } else {}
-                                },
-                                icon: FaIcon(
-                                  _isLike
-                                      ? FontAwesomeIcons.solidHeart
-                                      : FontAwesomeIcons.heart,
-                                  color: _isLike
-                                      ? Colors.green.shade600
-                                      : Colors.white.withOpacity(0.6),
-                                  size: 20,
-                                )),
+                              onPressed: () {
+                                // Condiciton
+                                if (_isLike) {
+                                  // Remove song from liked songs
+                                  httpService.getUserId(user.displayName!).then(
+                                        (id) => httpService
+                                            .getJsonLikedSongs(
+                                                user.displayName!)
+                                            .then(
+                                              (currentSongs) =>
+                                                  httpService.removeLikedSong(
+                                                      id,
+                                                      currentSongs,
+                                                      widget.song.name),
+                                            ),
+                                      );
+                                } else {
+                                  // Add song to liked songs
+                                  httpService.getUserId(user.displayName!).then(
+                                        (id) => httpService
+                                            .getJsonLikedSongs(
+                                                user.displayName!)
+                                            .then(
+                                              (currentSongs) =>
+                                                  httpService.addLikedSong(
+                                                      id,
+                                                      currentSongs,
+                                                      widget.song.name,
+                                                      widget.song.imageURL,
+                                                      widget.song.songURL,
+                                                      widget.song.artist,
+                                                      widget.song.language,
+                                                      widget.song.category),
+                                            ),
+                                      );
+                                }
+                              },
+                              icon: FaIcon(
+                                _isLike
+                                    ? FontAwesomeIcons.solidHeart
+                                    : FontAwesomeIcons.heart,
+                                color: _isLike
+                                    ? Colors.green.shade600
+                                    : Colors.white.withOpacity(0.6),
+                                size: 20,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -239,10 +279,12 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                                   value: _position.inSeconds.toDouble(),
                                   max: _duration.inSeconds.toDouble(),
                                   onChanged: (value) {
-                                    setState(() {
-                                      changeToSeconds(value.toInt());
-                                      value = value;
-                                    });
+                                    setState(
+                                      () {
+                                        changeToSeconds(value.toInt());
+                                        value = value;
+                                      },
+                                    );
                                   },
                                 ),
                               ),
@@ -332,61 +374,55 @@ class _NowPlayingScreenState extends State<NowPlayingScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                      onPressed: () {
-                                        setState(
-                                          () {
-                                            if (_isLooping == 2) {
-                                              // Lopp off
-                                              widget.audioPlayer
-                                                  .setLoopMode(LoopMode.off);
-                                            } else if (_isLooping == 1) {
-                                              // Loop one only
-                                              widget.audioPlayer
-                                                  .setLoopMode(LoopMode.one);
-                                            } else {
-                                              // Loop all
-                                              widget.audioPlayer
-                                                  .setLoopMode(LoopMode.all);
-                                            }
-                                            _isLooping += 1;
-                                            _isLooping = _isLooping % 3;
-                                          },
-                                        );
-                                      },
-                                      icon: _isLooping == 1
-                                          ? FaIcon(
-                                              FontAwesomeIcons.repeat,
-                                              color: Colors.white,
-                                              size: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.05,
-                                            )
-                                          : _isLooping == 2
-                                              ? Image.asset(
-                                                  'assets/images/repeatOne.png',
-                                                  color: Colors.white,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.03,
-                                                )
-                                              : FaIcon(
-                                                  FontAwesomeIcons.repeat,
-                                                  color: Colors.white
-                                                      .withOpacity(0.6),
-                                                  size: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.05,
-                                                )
-                                      // FaIcon(
-                                      //   FontAwesomeIcons.repeat,
-                                      //   color: _isLooping == 1
-                                      //       ? Colors.white.withOpacity(1)
-                                      //       : Colors.white.withOpacity(0.6),
-
-                                      ),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          if (_isLooping == 2) {
+                                            // Lopp off
+                                            widget.audioPlayer
+                                                .setLoopMode(LoopMode.off);
+                                          } else if (_isLooping == 1) {
+                                            // Loop one only
+                                            widget.audioPlayer
+                                                .setLoopMode(LoopMode.one);
+                                          } else {
+                                            // Loop all
+                                            widget.audioPlayer
+                                                .setLoopMode(LoopMode.all);
+                                          }
+                                          _isLooping += 1;
+                                          _isLooping = _isLooping % 3;
+                                        },
+                                      );
+                                    },
+                                    icon: _isLooping == 1
+                                        ? FaIcon(
+                                            FontAwesomeIcons.repeat,
+                                            color: Colors.white,
+                                            size: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          )
+                                        : _isLooping == 2
+                                            ? Image.asset(
+                                                'assets/images/repeatOne.png',
+                                                color: Colors.white,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.03,
+                                              )
+                                            : FaIcon(
+                                                FontAwesomeIcons.repeat,
+                                                color: Colors.white
+                                                    .withOpacity(0.6),
+                                                size: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.05,
+                                              ),
+                                  ),
                                 ],
                               ),
                             ],

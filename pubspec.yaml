@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Fetch Data
   http:
 
 
@@ -50,9 +51,6 @@ dependencies:
   # Google Fonts
   google_fonts: ^4.0.3
 
-  # Fetch Data
-  axios: ^1.0.1+1
-
   # State Management
   provider: ^6.0.5
 
@@ -65,11 +63,6 @@ dependencies:
   # Video Player
   video_player: ^2.5.1
 
-  # MongoDB
-  mongo_dart: ^0.8.2
-
-  # Server
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -81,6 +74,12 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+  # Splash Screen
+  flutter_native_splash: ^2.2.17
+
+flutter_native_splash:
+  color: "#161717"
+  image: assets/images/app_icon.png
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

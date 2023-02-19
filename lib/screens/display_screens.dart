@@ -1,4 +1,3 @@
-// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -24,7 +23,6 @@ class _DisplayScreensState extends State<DisplayScreens> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: navList[_currentIndex],
-      
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         iconSize: 18,
@@ -43,23 +41,21 @@ class _DisplayScreensState extends State<DisplayScreens> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.search),
-            activeIcon: FaIcon(FontAwesomeIcons.search),
+            icon: FaIcon(FontAwesomeIcons.magnifyingGlass),
+            activeIcon: FaIcon(FontAwesomeIcons.magnifyingGlass),
             label: 'Search',
           ),
-          // BottomNavigationBarItem(
-          //     icon: FaIcon(FontAwesomeIcons.play),
-          //     activeIcon: FaIcon(FontAwesomeIcons.play),
-          //     label: 'Now Playing'),
           BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.bars),
               activeIcon: FaIcon(FontAwesomeIcons.bars),
               label: 'Library'),
         ],
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          setState(
+            () {
+              _currentIndex = index;
+            },
+          );
         },
       ),
     );
