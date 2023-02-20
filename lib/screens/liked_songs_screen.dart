@@ -1,5 +1,6 @@
 import 'package:audify/models/export_models.dart';
 import 'package:audify/screens/export_screens.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../globle/variable.dart';
@@ -12,6 +13,7 @@ class LikedSongsScreen extends StatefulWidget {
 }
 
 class _LikedSongsScreen extends State<LikedSongsScreen> {
+  final user = FirebaseAuth.instance.currentUser!;
   @override
   Widget build(BuildContext context) {
     return Container(
